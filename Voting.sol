@@ -2,9 +2,17 @@
 pragma solidity ^0.8.24;
 
 contract Voting {
+
+    struct Party {
+        string partyName;
+        string partyLeader;
+    }
+
     address public administrator;
     uint public VotingStartTime;
     uint public VotingEndTime;
+    mapping (address => bool) alreadyVoted;
+    mapping (address => Party) voteToParty;
 
     constructor () payable {
         administrator = msg.sender;
@@ -17,6 +25,11 @@ contract Voting {
 
     modifier timeEndedOrNot {
         require (block.timestamp < VotingEndTime, "Voting time has ended.");
+        _;
+    }
+
+    modifier hasNotVotedAlready(address voter_address) {
+        require (alreadyVoted[voter_address] == false, "You have already put in your vote.");
         _;
     }
 
@@ -34,7 +47,12 @@ contract Voting {
         require (block.timestamp >= VotingEndTime, "There is still some time left for voting to end.");
         emit votingEnded(block.timestamp);
     }
+
+    // function vote(string partyCandidate) hasNotVotedAlready public {
+        
+    // }
 }
+
 
 // contract BallotBox {
 //     struct BallotBoxes {
