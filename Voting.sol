@@ -2,20 +2,46 @@
 pragma solidity ^0.8.24;
 
 contract Voting {
-
     struct Party {
+        string partyId;
         string partyName;
         string partyLeader;
+        Candidate[] candidates;
+        uint8 numberOfCandidates;
+    }
+
+    struct Candidate {
+        string candidateName;
+        address candidateId;
+    }
+
+    struct Voter {
+        string voterName;
+        address voterId;
     }
 
     address public administrator;
     uint public VotingStartTime;
     uint public VotingEndTime;
-    mapping (address => bool) alreadyVoted;
-    mapping (address => Party) voteToParty;
+    mapping (address => bool) public alreadyVoted;
+    mapping (address => Party) public voteToParty;
+    mapping (string => Party) public MAP_PartyDetails;
 
     constructor () payable {
-        administrator = msg.sender;
+        administrator = msg.sender;   
+    }
+
+    function addParty(string calldata _partyId, string calldata _partyName, string calldata _partyLeader) public {
+        Party storage newParty = MAP_PartyDetails[_partyId];
+        newParty.partyId = _partyId;
+        newParty.partyName = _partyName;
+        newParty.partyLeader = _partyLeader;
+    }
+
+    function addCandidateToParty(string calldata _partyId, string calldata _candidateName, address _candidateId) public {
+        Party storage party = MAP_PartyDetails[_partyId];
+        party.candidates.push(Candidate(_candidateName, _candidateId));
+        party.numberOfCandidates++;
     }
 
     modifier adminOnly {
@@ -48,29 +74,11 @@ contract Voting {
         emit votingEnded(block.timestamp);
     }
 
-    // function vote(string partyCandidate) hasNotVotedAlready public {
-        
-    // }
+    function getPartyById (string calldata _partyId) public view returns (Party memory) {
+        return MAP_PartyDetails[_partyId];
+    }
+
+    function getCandidatesByPartyId (string calldata _partyId) public view returns (Candidate[] memory) {
+        return MAP_PartyDetails[_partyId].candidates;
+    }
 }
-
-
-// contract BallotBox {
-//     struct BallotBoxes {
-//         string box_id;
-//         uint32 number_of_votes;
-//         string region;
-//         string station_number;
-//         string city;
-//     }
-//     mapping (string => BallotBoxes) public MAP_BallotBox;
-//     mapping (string => uint) public MAP_station_number;
-
-//     constructor (string memory region, string memory city) {
-//         string memory box_id = string(abi.encodePacked(region,"_",city,));
-//         BallotBoxes memory new_ballot_box = BallotBoxes(box_id, 0, region, MAP_station_number[city], city);
-//     }
-
-//     function viewAllBallotBoxByCity (string calldata city) public view returns (BallotBoxes memory) {
-//         return MAP_BallotBox[city];
-//     }
-// }

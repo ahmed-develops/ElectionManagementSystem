@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EMS</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>EMS</h1>
+    <p>Welcome to ELECTION MANAGEMENT SYSTEM!</p>
+    <button type="button" onClick="connectToIdentityChain()">Connect to IdentityChain</button>
+    <p id="accountInfo">Identity ID: [Not connected]</p>
+
+    <script>
+        let userAccount = null;
+
+        async function connectToIdentityChain() {
+            if (typeof window.ethereum !== 'undefined') {
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                updateAccountInfo();
+            } else {
+                alert('Please install MetaMask to connect to IdentityChain.');
+            }
+        }
+
+        function updateAccountInfo() {
+            document.getElementById('accountInfo').innerText = `Identity ID: ${userAccount}`;
+        }
+    </script>
+</body>
+</html>
